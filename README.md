@@ -1,6 +1,5 @@
-[![nodesource/node](http://dockeri.co/image/silverwyrda/oauth2)](https://registry.hub.docker.com/u/silverwyrda/oauth2/)
+[![nodesource/node](http://dockeri.co/image/silverwyrda/proxy)](https://registry.hub.docker.com/u/silverwyrda/proxy/)
 
-[![Build Status](https://travis-ci.org/Quorumsco/oauth2.svg)](https://travis-ci.org/Quorumsco/oauth2) [![Godoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/Quorumsco/oauth2) [![Coverage Status](https://coveralls.io/repos/Quorumsco/oauth2/badge.svg)](https://coveralls.io/r/Quorumsco/oauth2)
+[![Build Status](https://travis-ci.org/quorumsco/proxy.svg)](https://travis-ci.org/quorumsco/proxy) [![Godoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/quorumsco/proxy) [![Coverage Status](https://coveralls.io/repos/quorumsco/proxy/badge.svg)](https://coveralls.io/r/quorumsco/proxy)
 
-# OAuth2
-OAuth2 server
+# Proxy for OAuth2 client side applications

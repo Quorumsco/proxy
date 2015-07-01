@@ -1,16 +1,17 @@
 package main
 
 import (
+	"fmt"
+	"log"
+	"net/http"
 	"runtime"
 
 	"gopkg.in/redis.v3"
 
-	"github.com/Quorumsco/proxy/controllers"
 	"github.com/codegangsta/cli"
-	"github.com/iogo-framework/application"
+	"github.com/elazarl/goproxy"
 	"github.com/iogo-framework/cmd"
 	"github.com/iogo-framework/logs"
-	"github.com/iogo-framework/router"
 )
 
 func init() {
@@ -33,31 +34,30 @@ func main() {
 }
 
 func serve(ctx *cli.Context) error {
-	var app *application.Application
-	var err error
-
-	if app, err = application.New(); err != nil {
-		return err
-	}
-
 	client := redis.NewClient(&redis.Options{Addr: ctx.String("redis")})
 
 	if _, err := client.Ping().Result(); err != nil {
 		return err
 	}
 	logs.Debug("Connected to Redis at %s", ctx.String("redis"))
-	app.Components["Redis"] = client
 
-	app.Mux = router.New()
+	proxy := goproxy.NewProxyHttpServer()
+	proxy.Verbose = true
 
-	if ctx.Bool("debug") {
-		app.Use(router.Logger)
-	}
+	var hasSessionHeaders = goproxy.ReqConditionFunc(func(req *http.Request, ctx *goproxy.ProxyCtx) bool {
+		req.ParseForm()
+		return req.Header.Get("SID") != "" || (req.FormValue("username") != "" && req.FormValue("password") != "")
+	})
 
-	app.Use(app.Apply)
-	app.Get("/sessions", controllers.Proxy)
+	proxy.OnRequest(hasSessionHeaders).DoFunc(
+		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+			fmt.Println("Add proxy client/secret ids")
+			return r, nil
+		},
+	)
 
-	app.Serve(ctx.String("listen"))
+	logs.Info("Listening on %s", ctx.String("listen"))
+	log.Fatal(http.ListenAndServe(ctx.String("listen"), proxy))
 
 	return nil
 }
