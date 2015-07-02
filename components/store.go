@@ -1,12 +1,15 @@
 package components
 
+// Session represents a client session.
 type Session struct {
-	Cookie       string
+	ID           string
 	AccessToken  string
 	RefreshToken string
+	ExpiresIn    int
 }
 
+// SessionStore is an interface for session storage backends.
 type SessionStore interface {
-	Save(*Session)
-	Load() *Session
+	Save(*Session) error
+	Load(string) (*Session, error)
 }
