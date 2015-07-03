@@ -127,7 +127,7 @@ func serve(ctx *cli.Context) error {
 				return nil, nil
 			}
 
-			// Give a json response to clients
+			// TODO: Give a json response to clients
 			resp = goproxy.NewResponse(req, "text/plain", http.StatusOK, "")
 			cookie = &http.Cookie{Name: "SID", Value: session.ID}
 			resp.Header.Add("Set-Cookie", cookie.String())
