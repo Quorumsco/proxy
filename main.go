@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"runtime"
 	"strings"
@@ -137,7 +136,5 @@ func serve(ctx *cli.Context) error {
 	)
 
 	logs.Info("Listening on %s", ctx.String("listen"))
-	log.Fatal(http.ListenAndServe(ctx.String("listen"), proxy))
-
-	return nil
+	return http.ListenAndServe(ctx.String("listen"), proxy)
 }
