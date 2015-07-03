@@ -51,6 +51,10 @@ func serve(ctx *cli.Context) error {
 	clientID := ctx.Args()[0]
 	clientSecret := ctx.Args()[1]
 
+	if ctx.Bool("debug") {
+		logs.Level(logs.DebugLevel)
+	}
+
 	client := redis.NewClient(&redis.Options{Addr: ctx.String("redis")})
 	if _, err := client.Ping().Result(); err != nil {
 		return err
