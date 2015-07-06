@@ -4,7 +4,7 @@ then
     npm update -g npm
     npm install -g dredd
 fi
-go build main.go; true
+go build main.go
 ./main -m &
 sleep 3
 PID=$!
