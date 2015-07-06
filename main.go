@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -38,6 +37,9 @@ func main() {
 		cli.StringFlag{Name: "redis-host", Value: "redis", Usage: "redis host", EnvVar: "REDIS_HOST"},
 		cli.IntFlag{Name: "redis-port", Value: 6379, Usage: "redis port", EnvVar: "REDIS_PORT"},
 
+		cli.StringFlag{Name: "client-id", Value: "proxy", Usage: "oauth2 proxy client id", EnvVar: "CLIENT_ID"},
+		cli.StringFlag{Name: "client-secret", Value: "proxy", Usage: "oauth2 proxy client secret", EnvVar: "CLIENT_SECRET"},
+
 		cli.BoolFlag{Name: "debug, d", Usage: "print debug information", EnvVar: "DEBUG"},
 		cli.HelpFlag,
 	}...)
@@ -45,14 +47,8 @@ func main() {
 }
 
 func serve(ctx *cli.Context) error {
-	if len(ctx.Args()) < 2 {
-		fmt.Println("Missing required arguments")
-		cli.ShowAppHelp(ctx)
-		return nil
-	}
-
-	clientID := ctx.Args()[0]
-	clientSecret := ctx.Args()[1]
+	clientID := ctx.String("client-id")
+	clientSecret := ctx.String("client-secret")
 
 	if ctx.Bool("debug") {
 		logs.Level(logs.DebugLevel)
