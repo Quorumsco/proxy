@@ -34,7 +34,7 @@ func main() {
 	cmd.Flags = append(cmd.Flags, []cli.Flag{
 		cli.StringFlag{Name: "listen, l", Value: "0.0.0.0:8080", Usage: "http listening host:port"},
 		cli.StringFlag{Name: "redis, r", Value: "localhost:6379", Usage: "redis host:port"},
-		cli.BoolFlag{Name: "debug, d", Usage: "print debug information"},
+		cli.BoolFlag{Name: "debug, d", Usage: "print debug information", EnvVar: "DEBUG"},
 		cli.HelpFlag,
 	}...)
 	cmd.RunAndExitOnError()
