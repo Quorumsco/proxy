@@ -1,14 +1,14 @@
 FROM golang
 MAINTAINER Douézan-Grard Guillaume - Quorums
 
-ADD . /go/src/github.com/Quorumsco/contacts
+ADD . /go/src/github.com/quorumsco/proxy
 
-WORKDIR /go/src/github.com/Quorumsco/contacts
+WORKDIR /go/src/github.com/quorumsco/proxy
 
 RUN \
   go get && \
-  go build main.go
+  go build
 
 EXPOSE 8080
 
-ENTRYPOINT ["./main"]
+ENTRYPOINT ["./proxy"]
