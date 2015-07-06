@@ -6,10 +6,8 @@ before_install:
  - go get golang.org/x/tools/cmd/cover
  - go get github.com/golang/lint/golint
  - go get golang.org/x/tools/cmd/goimports
-install: go get -t -v ./...; true
+install: go get -t -v ./...
 script:
- - mv $TRAVIS_BUILD_DIR $HOME/main
- - cd $HOME/main
  - ./scripts/cover.sh
  - ./scripts/dredd.sh
 after_success:
