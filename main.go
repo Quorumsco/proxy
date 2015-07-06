@@ -32,8 +32,12 @@ func main() {
 	cmd.Version = "0.0.1"
 	cmd.Before = serve
 	cmd.Flags = append(cmd.Flags, []cli.Flag{
-		cli.StringFlag{Name: "listen, l", Value: "0.0.0.0:8080", Usage: "http listening host:port"},
-		cli.StringFlag{Name: "redis, r", Value: "localhost:6379", Usage: "redis host:port"},
+		cli.StringFlag{Name: "listen-host", Value: "0.0.0.0", Usage: "server listening host", EnvVar: "LISTEN_HOST"},
+		cli.IntFlag{Name: "listen-port", Value: 8080, Usage: "server listening port", EnvVar: "LISTEN_PORT"},
+
+		cli.StringFlag{Name: "redis-host", Value: "redis", Usage: "redis host", EnvVar: "REDIS_HOST"},
+		cli.IntFlag{Name: "redis-port", Value: 6379, Usage: "redis port", EnvVar: "REDIS_PORT"},
+
 		cli.BoolFlag{Name: "debug, d", Usage: "print debug information", EnvVar: "DEBUG"},
 		cli.HelpFlag,
 	}...)
