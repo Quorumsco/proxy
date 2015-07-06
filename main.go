@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -54,11 +55,12 @@ func serve(ctx *cli.Context) error {
 		logs.Level(logs.DebugLevel)
 	}
 
-	client := redis.NewClient(&redis.Options{Addr: ctx.String("redis")})
+	redisHostPort := fmt.Sprintf("%s:%d", ctx.String("redis-host"), ctx.Int("redis-port"))
+	client := redis.NewClient(&redis.Options{Addr: redisHostPort})
 	if _, err := client.Ping().Result(); err != nil {
 		return err
 	}
-	logs.Debug("Connected to Redis at %s", ctx.String("redis"))
+	logs.Debug("Connected to Redis at %s", redisHostPort)
 	store := components.NewRedisStore(client)
 
 	proxy := goproxy.NewProxyHttpServer()
@@ -135,6 +137,7 @@ func serve(ctx *cli.Context) error {
 		},
 	)
 
-	logs.Info("Listening on %s", ctx.String("listen"))
-	return http.ListenAndServe(ctx.String("listen"), proxy)
+	listenHostPort := fmt.Sprintf("%s:%d", ctx.String("listen-host"), ctx.Int("listen-port"))
+	logs.Info("Listening on %s", listenHostPort)
+	return http.ListenAndServe(listenHostPort, proxy)
 }
