@@ -11,7 +11,6 @@ import (
 	"net/http/httputil"
 	"runtime"
 	"strings"
-	"time"
 
 	"gopkg.in/redis.v3"
 
@@ -81,10 +80,7 @@ func serve(ctx *cli.Context) error {
 		fmt.Println(string(dump))
 		req.URL.Scheme = req.Header.Get("X-Scheme")
 		req.URL.Host = req.Host
-		// fmt.Println(req.URL.IsAbs())
-		time.Sleep(1 * time.Second)
 		proxy.ServeHTTP(w, req)
-		// http.Error(w, "This is a proxy server. Does not respond to non-proxy requests.", 500)
 	})
 
 	proxy.OnRequest(session).DoFunc(
