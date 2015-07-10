@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
+	"os"
 	"runtime"
 	"strings"
 
@@ -18,6 +19,7 @@ import (
 	"github.com/elazarl/goproxy"
 	"github.com/iogo-framework/cmd"
 	"github.com/iogo-framework/logs"
+	"github.com/iogo-framework/settings"
 	"github.com/pborman/uuid"
 	"github.com/quorumsco/proxy/components"
 )
@@ -33,16 +35,10 @@ func main() {
 	cmd.Version = "0.0.1"
 	cmd.Before = serve
 	cmd.Flags = append(cmd.Flags, []cli.Flag{
-		cli.StringFlag{Name: "listen-host", Value: "0.0.0.0", Usage: "server listening host", EnvVar: "LISTEN_HOST"},
-		cli.IntFlag{Name: "listen-port", Value: 8080, Usage: "server listening port", EnvVar: "LISTEN_PORT"},
-
-		cli.StringFlag{Name: "redis-host", Value: "redis", Usage: "redis host", EnvVar: "REDIS_HOST"},
-		cli.IntFlag{Name: "redis-port", Value: 6379, Usage: "redis port", EnvVar: "REDIS_PORT"},
-
 		cli.StringFlag{Name: "client-id", Value: "proxy", Usage: "oauth2 proxy client id", EnvVar: "CLIENT_ID"},
 		cli.StringFlag{Name: "client-secret", Value: "proxy", Usage: "oauth2 proxy client secret", EnvVar: "CLIENT_SECRET"},
 
-		cli.BoolFlag{Name: "debug, d", Usage: "print debug information", EnvVar: "DEBUG"},
+		cli.BoolFlag{Name: "debug, d", Usage: "print debug information"},
 		cli.HelpFlag,
 	}...)
 	cmd.RunAndExitOnError()
@@ -52,20 +48,25 @@ func serve(ctx *cli.Context) error {
 	clientID := ctx.String("client-id")
 	clientSecret := ctx.String("client-secret")
 
-	if ctx.Bool("debug") {
+	config, err := settings.Parse(ctx.String("config"))
+	if err != nil && ctx.String("config") != "" {
+		logs.Error(err)
+	}
+
+	if ctx.Bool("debug") || config.Debug() {
 		logs.Level(logs.DebugLevel)
 	}
 
-	redisHostPort := fmt.Sprintf("%s:%d", ctx.String("redis-host"), ctx.Int("redis-port"))
-	client := redis.NewClient(&redis.Options{Addr: redisHostPort})
+	redisSettings, err := config.Redis()
+	client := redis.NewClient(&redis.Options{Addr: redisSettings.String()})
 	if _, err := client.Ping().Result(); err != nil {
 		return err
 	}
-	logs.Debug("Connected to Redis at %s", redisHostPort)
+	logs.Debug("Connected to Redis at %s", redisSettings.String())
 	store := components.NewRedisStore(client)
 
 	proxy := goproxy.NewProxyHttpServer()
-	if ctx.Bool("debug") {
+	if ctx.Bool("debug") || config.Debug() {
 		proxy.Verbose = true
 	}
 
@@ -147,8 +148,11 @@ func serve(ctx *cli.Context) error {
 			return req, resp
 		},
 	)
-
-	listenHostPort := fmt.Sprintf("%s:%d", ctx.String("listen-host"), ctx.Int("listen-port"))
-	logs.Info("Listening on %s", listenHostPort)
-	return http.ListenAndServe(listenHostPort, proxy)
+	server, err := config.Server()
+	if err != nil {
+		logs.Critical(err)
+		os.Exit(1)
+	}
+	logs.Info("Listening on %s", server.String())
+	return http.ListenAndServe(server.String(), proxy)
 }
