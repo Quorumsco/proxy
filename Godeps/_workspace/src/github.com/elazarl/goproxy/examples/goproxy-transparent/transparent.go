@@ -12,7 +12,6 @@ import (
 	"regexp"
 
 	"github.com/elazarl/goproxy"
-	"github.com/inconshreveable/go-vhost"
 )
 
 func orPanic(err error) {
