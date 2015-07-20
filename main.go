@@ -38,6 +38,7 @@ func main() {
 		cli.StringFlag{Name: "client-id", Value: "proxy", Usage: "oauth2 proxy client id", EnvVar: "CLIENT_ID"},
 		cli.StringFlag{Name: "client-secret", Value: "proxy", Usage: "oauth2 proxy client secret", EnvVar: "CLIENT_SECRET"},
 
+		cli.StringFlag{Name: "config, c", Usage: "configuration file", EnvVar: "CONFIG"},
 		cli.BoolFlag{Name: "debug, d", Usage: "print debug information"},
 		cli.HelpFlag,
 	}...)
@@ -97,8 +98,6 @@ func serve(ctx *cli.Context) error {
 				req.Header.Del("Cookie")
 				req.Header.Add("Authorization", "Bearer "+session.AccessToken)
 				return req, nil
-			} else {
-				return req, goproxy.NewResponse(req, "text/plain", http.StatusForbidden, "Invalid cookie")
 			}
 
 			// Perform an OAuth "Resource Owner Password Credentials Grant"

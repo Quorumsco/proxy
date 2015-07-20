@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"strconv"
 
 	"gopkg.in/redis.v3"
@@ -30,6 +31,12 @@ func (r *RedisStore) Save(s *Session) error {
 
 // Load a previously saved session or error.
 func (r *RedisStore) Load(id string) (*Session, error) {
+	exist, err := r.client.Exists(id).Result()
+	if err != nil {
+		return nil, err
+	} else if !exist {
+		return nil, fmt.Errorf("No such key %s", id)
+	}
 	sMap, err := r.client.HGetAllMap(id).Result()
 	if err != nil {
 		return nil, err
