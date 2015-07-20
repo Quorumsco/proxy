@@ -92,10 +92,13 @@ func serve(ctx *cli.Context) error {
 			if err == nil {
 				session, err := store.Load(cookie.Value)
 				if err != nil {
-					return req, nil
+					return req, goproxy.NewResponse(req, "text/plain", http.StatusForbidden, "Invalid cookie")
 				}
 				req.Header.Add("Authorization", "Bearer "+session.AccessToken)
+				req.Header.Del("Set-Cookie")
 				return req, nil
+			} else {
+				return req, goproxy.NewResponse(req, "text/plain", http.StatusForbidden, "Invalid cookie")
 			}
 
 			// Perform an OAuth "Resource Owner Password Credentials Grant"
