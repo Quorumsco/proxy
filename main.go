@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"runtime"
 	"strings"
@@ -75,8 +77,8 @@ func serve(ctx *cli.Context) error {
 	})
 
 	proxy.NonproxyHandler = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		//dump, _ := httputil.DumpRequest(req, true)
-		//fmt.Println(string(dump))
+		dump, _ := httputil.DumpRequest(req, true)
+		fmt.Println(string(dump))
 		req.URL.Scheme = req.Header.Get("X-Scheme")
 		req.URL.Host = req.Host
 		proxy.ServeHTTP(w, req)
@@ -92,8 +94,8 @@ func serve(ctx *cli.Context) error {
 				if err != nil {
 					return req, goproxy.NewResponse(req, "text/plain", http.StatusForbidden, "Invalid cookie")
 				}
+				req.Header.Del("Cookie")
 				req.Header.Add("Authorization", "Bearer "+session.AccessToken)
-				req.Header.Del("Set-Cookie")
 				return req, nil
 			} else {
 				return req, goproxy.NewResponse(req, "text/plain", http.StatusForbidden, "Invalid cookie")
