@@ -1,8 +1,6 @@
 {
   "settings": {
-    "debug": true,
-    "migrate": true,
-    "database": "postgres"
+    "debug": true
   },
   "components": {
     "server": {
@@ -11,12 +9,6 @@
     },
     "redis": {
       "host": "localhost"
-    },
-    "postgres": {
-      "db": "postgres",
-      "host": "localhost",
-      "port": 5432,
-      "user": "postgres"
     }
   }
 }
