@@ -17,11 +17,11 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/elazarl/goproxy"
-	"github.com/iogo-framework/cmd"
-	"github.com/iogo-framework/logs"
-	"github.com/iogo-framework/settings"
 	"github.com/pborman/uuid"
+	"github.com/quorumsco/cmd"
+	"github.com/quorumsco/logs"
 	"github.com/quorumsco/proxy/components"
+	"github.com/quorumsco/settings"
 )
 
 func init() {
