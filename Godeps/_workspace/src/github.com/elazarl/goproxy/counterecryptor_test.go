@@ -4,12 +4,11 @@ import (
 	"bytes"
 	"crypto/rsa"
 	"encoding/binary"
+	"github.com/elazarl/goproxy"
 	"io"
 	"math"
 	"math/rand"
 	"testing"
-
-	"github.com/elazarl/goproxy"
 )
 
 type RandSeedReader struct {

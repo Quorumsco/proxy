@@ -8,7 +8,6 @@ import (
 	"image/png"
 	"io/ioutil"
 	"net/http"
-
 	. "github.com/elazarl/goproxy"
 	"github.com/elazarl/goproxy/regretable"
 )

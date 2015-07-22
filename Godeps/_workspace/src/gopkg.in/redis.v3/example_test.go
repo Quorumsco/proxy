@@ -2,7 +2,6 @@ package redis_test
 
 import (
 	"fmt"
-	"net"
 	"strconv"
 	"sync"
 	"time"
@@ -166,27 +165,25 @@ func ExampleMulti() {
 }
 
 func ExamplePubSub() {
-	pubsub := client.PubSub()
-	defer pubsub.Close()
-
-	err := pubsub.Subscribe("mychannel")
+	pubsub, err := client.Subscribe("mychannel")
 	if err != nil {
 		panic(err)
 	}
+	defer pubsub.Close()
 
 	err = client.Publish("mychannel", "hello").Err()
 	if err != nil {
 		panic(err)
 	}
 
-	for {
+	for i := 0; i < 4; i++ {
 		msgi, err := pubsub.ReceiveTimeout(100 * time.Millisecond)
 		if err != nil {
-			if neterr, ok := err.(net.Error); ok && neterr.Timeout() {
-				// There are no more messages to process. Stop.
-				break
+			err := pubsub.Ping("")
+			if err != nil {
+				panic(err)
 			}
-			panic(err)
+			continue
 		}
 
 		switch msg := msgi.(type) {
@@ -194,6 +191,8 @@ func ExamplePubSub() {
 			fmt.Println(msg.Kind, msg.Channel)
 		case *redis.Message:
 			fmt.Println(msg.Channel, msg.Payload)
+		case *redis.Pong:
+			fmt.Println(msg)
 		default:
 			panic(fmt.Sprintf("unknown message: %#v", msgi))
 		}
@@ -201,6 +200,7 @@ func ExamplePubSub() {
 
 	// Output: subscribe mychannel
 	// mychannel hello
+	// Pong
 }
 
 func ExampleScript() {
