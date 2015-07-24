@@ -39,7 +39,6 @@ func main() {
 		cli.StringFlag{Name: "client-secret", Value: "proxy", Usage: "oauth2 proxy client secret", EnvVar: "CLIENT_SECRET"},
 
 		cli.StringFlag{Name: "config, c", Usage: "configuration file", EnvVar: "CONFIG"},
-		cli.BoolFlag{Name: "debug, d", Usage: "print debug information"},
 		cli.HelpFlag,
 	}...)
 	cmd.RunAndExitOnError()
@@ -49,12 +48,16 @@ func serve(ctx *cli.Context) error {
 	clientID := ctx.String("client-id")
 	clientSecret := ctx.String("client-secret")
 
-	config, err := settings.Parse(ctx.String("config"))
-	if err != nil && ctx.String("config") != "" {
-		logs.Error(err)
+	var config settings.Config
+	var err error
+	if ctx.String("config") != "" {
+		config, err = settings.Parse(ctx.String("config"))
+		if err != nil {
+			logs.Error(err)
+		}
 	}
 
-	if ctx.Bool("debug") || config.Debug() {
+	if config.Debug() {
 		logs.Level(logs.DebugLevel)
 	}
 
@@ -67,7 +70,7 @@ func serve(ctx *cli.Context) error {
 	store := components.NewRedisStore(client)
 
 	proxy := goproxy.NewProxyHttpServer()
-	if ctx.Bool("debug") || config.Debug() {
+	if config.Debug() {
 		proxy.Verbose = true
 	}
 
